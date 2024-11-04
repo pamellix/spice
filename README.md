@@ -1,5 +1,8 @@
 # Spice - CLI Utility for Database Operations Management
 
+![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
+![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=for-the-badge&logo=rust&logoColor=white)
+
 `spice` is a CLI utility written in Rust, designed for managing database operations such as migrations and backups.
 
 ## Requirements
