@@ -1,5 +1,8 @@
+use std::fmt::format;
 use std::{fs, io::Read};
 use std::fs::File;
+use sqlx::mysql::MySqlPoolOptions;
+use sqlx::{MySql, Pool, Postgres};
 use sqlx::{postgres::PgPoolOptions, Column, Row};
 use std::io::Write;
 use serde::{Serialize, Deserialize};
@@ -11,9 +14,20 @@ pub enum OperationType {
     Migrate
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize )]
+pub enum DatabaseType {
+    Postgres,
+    MySql
+}
+
+pub enum DatabasePool {
+    Postgres(Pool<Postgres>),
+    MySQL(Pool<MySql>),
+}
+
 #[derive(Debug, Serialize, Deserialize, Clone )]
 pub struct DbConfig {
-    pub db_type: String,
+    pub db_type: DatabaseType,
     pub host: String,
     pub user: String,
     pub password: String,
@@ -25,13 +39,17 @@ pub struct DbConfig {
 impl DbConfig {
     pub fn new(db_type: &str, host: &str, user: &str, password: &str, database: &str, output_file: &str, type_of_operation: &str) -> DbConfig {
         let config = DbConfig {
-            db_type: db_type.to_string(),
+            db_type: match db_type.to_lowercase().as_str() {
+                "postgres" => DatabaseType::Postgres,
+                "mysql" => DatabaseType::MySql,
+                _ => DatabaseType::Postgres
+            },
             host: host.to_string(),
             user: user.to_string(),
             password: password.to_string(),
             database: database.to_string(),
             output_file: output_file.to_string(),
-            type_of_operation: match type_of_operation {
+            type_of_operation: match type_of_operation.to_lowercase().as_str() {
                 "pull" => OperationType::Pull,
                 "migrate" => OperationType::Migrate,
                 &_ => OperationType::Pull
@@ -60,7 +78,7 @@ impl DbConfig {
         file.write_all(content.as_bytes())
     }
 
-    pub async fn connection(&self) -> Result<sqlx::Pool<sqlx::Postgres>, sqlx::Error> {
+    pub async fn connection(&self) -> Result<DatabasePool, Box<sqlx::Error>> {
         println!("Connecting to the database");
 
         let config = DbConfig::load_from_file("config.json").unwrap_or_else(|| {
@@ -68,18 +86,34 @@ impl DbConfig {
             self.clone()
         });
 
-        let url = format!(
-            "postgresql://{}:{}@{}/{}",
-            config.user, config.password, config.host, config.database
-        );
+        match &self.db_type {
+            DatabaseType::Postgres => {
+                let url = format!(
+                    "postgres://{}:{}@{}/{}",
+                    self.user, self.password, self.host, self.database
+                );
 
-        let pool = PgPoolOptions::new()
-            .max_connections(10)
-            .connect(&url)
-            .await?;
-        println!("Connection successful!");
+                let pool = PgPoolOptions::new()
+                    .max_connections(10)
+                    .connect(&url)
+                    .await?;
 
-        Ok(pool)
+                Ok(DatabasePool::Postgres(pool))
+            }
+            DatabaseType::MySql => {
+                let url = format!(
+                    "mysql://{}:{}@{}/{}",
+                    self.user, self.password, self.host, self.database
+                );
+
+                let pool = MySqlPoolOptions::new()
+                    .max_connections(10)
+                    .connect(&url)
+                    .await?;
+
+                Ok(DatabasePool::MySQL(pool))
+            }
+        }
     }
 
     pub async fn drop_all_tables(&self) -> Result<(), sqlx::Error> {
@@ -185,7 +219,7 @@ impl DbConfig {
 impl Default for DbConfig {
     fn default() -> Self {
         DbConfig {
-            db_type: "postgres".to_string(),
+            db_type: DatabaseType::Postgres,
             host: "".to_string(),
             user: "".to_string(),
             password: "".to_string(),
