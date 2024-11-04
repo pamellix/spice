@@ -1,4 +1,4 @@
-use crate::commands::dbconfig::{DbConfig, OperationType};
+use crate::config::{DatabaseType, DbConfig, OperationType};
 use clap::Parser;
 use std::path::Path;
 
@@ -20,7 +20,7 @@ pub struct MigrateCommand {
     pub operation_type: String,
 
     #[arg(help = "Specify the database type")]
-    pub db_type: Option<String>,
+    pub db_type: String,
 
     #[arg(help = "Specify the host")]
     pub host: Option<String>,
@@ -51,10 +51,6 @@ impl MigrateCommand {
             DbConfig::default()
         };
 
-        if let Some(db_type) = self.db_type {
-            config.db_type = db_type;
-        };
-
         if let Some(host) = self.host {
             config.host = host;
         };
@@ -77,21 +73,14 @@ impl MigrateCommand {
             _ => OperationType::Pull, 
         };
 
+        config.db_type = match self.db_type.as_str() {
+            "postgres" => DatabaseType::Postgres,
+            "mysql" => DatabaseType::MySql,
+            _ => DatabaseType::Postgres
+        };
+
         config.save_to_file(config_path).expect("Failed to save configuration");
         config
 
-    }
-}
-
-pub fn parse_args() -> DbConfig {
-    let cli = Cli::parse();
-
-    match cli.command {
-        Commands::Migrate(migrate_cmd) => {
-            let db = migrate_cmd.load_or_promt();
-
-            db.show_test_result();
-            db
-        }
     }
 }

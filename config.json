@@ -1,1 +1,1 @@
-{"db_type":"postgres","host":"217.25.92.169:5400","user":"admin","password":"root","database":"postgres","output_file":"another.sql","type_of_operation":"Pull"}
+{"db_type":"Postgres","host":"217.25.92.169:5400","user":"admin","password":"root","database":"postgres","output_file":"test_migrate.sql","type_of_operation":"Pull"}
