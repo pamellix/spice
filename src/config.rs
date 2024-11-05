@@ -26,6 +26,7 @@ pub struct DbConfig {
 }
 
 impl DbConfig {
+    #[warn(dead_code)]
     pub fn new(
         db_type: &str,
         host: &str,
