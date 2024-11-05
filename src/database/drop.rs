@@ -2,6 +2,7 @@ use crate::database::connection::DatabasePool;
 use sqlx::Row;
 use std::error::Error;
 
+#[warn(dead_code)]
 pub async fn drop_all_tables(pool: &DatabasePool) -> Result<(), Box<dyn Error>> {
     match pool {
         DatabasePool::Postgres(pg_pool) => {

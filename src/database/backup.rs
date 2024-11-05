@@ -1,10 +1,12 @@
 use crate::database::connection::DatabasePool;
+use log::info;
 use sqlx::{Row, Column};
 use std::fs::File;
 use std::io::Write;
 use std::error::Error;
 
 pub async fn backup_database(pool: &DatabasePool, output_file: &str) -> Result<(), Box<dyn Error>> {
+    info!("Starting backup process on file: {}", output_file);
     let mut file = File::create(output_file)?;
 
     match pool {
@@ -17,6 +19,8 @@ pub async fn backup_database(pool: &DatabasePool, output_file: &str) -> Result<(
             for table in tables {
                 let table_name: String = table.try_get("table_name")?;
                 writeln!(file, "\n-- TABLE --: {}\n", table_name)?;
+
+                info!("Backing up table: {}", table_name);
                 
                 let create_table_stmt = sqlx::query(&format!(
                     "SELECT 'CREATE TABLE {} (' || string_agg(column_name || ' ' || data_type, ', ') || ');' as create_statement \
@@ -65,6 +69,8 @@ pub async fn backup_database(pool: &DatabasePool, output_file: &str) -> Result<(
                 let table_name: String = table.try_get("table_name")?;
                 writeln!(file, "\n-- TABLE --: {}\n", table_name)?;
 
+                info!("Backing up table: {}", table_name);
+
                 let create_table_stmt = sqlx::query(&format!(
                     "SHOW CREATE TABLE {}",
                     table_name
@@ -104,5 +110,6 @@ pub async fn backup_database(pool: &DatabasePool, output_file: &str) -> Result<(
     }
 
     println!("Backup completed successfully in {}", output_file);
+    info!("Backup completed successfully in {}", output_file);
     Ok(())
 }

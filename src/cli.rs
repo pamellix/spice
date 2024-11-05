@@ -43,7 +43,7 @@ impl MigrateCommand {
         let config_path = "config.json";
 
         let mut config = if Path::new(config_path).exists() {
-            DbConfig::load_from_file(&config_path).unwrap_or_else(|| {
+            DbConfig::load_from_file(config_path).unwrap_or_else(|| {
                 println!("Failed to load config. Defaulting to manual input");
                 DbConfig::default()
             })
