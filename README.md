@@ -87,7 +87,7 @@ The program supports multiple commands. For example, the migrate command can be 
 #### Parameters Description:
 
 `-t`, `--operation_type`: Specifies the operation type (pull or migrate). Defaults to pull.<br><br>
-`--db_type`: Specifies the database type (e.g., postgres, and for this release, it supports only postgres).<br><br>
+`--db_type`: Specifies the database type (e.g., postgres, and for this release, it supports only postgres and mysql).<br><br>
 `--host`: Specifies the database host (e.g., localhost).<br><br>
 `-u`, `--user`: Specifies the database username.<br><br>
 `-p`, `--password`: Specifies the database password.<br><br>
