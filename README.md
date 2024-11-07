@@ -34,19 +34,24 @@ After successfully building the project, you can run the CLI utility through Car
 ## Running via Cargo
 
 To run the program with Cargo, use the following command:
-
+   ```sh
     cargo run -- <command> [options]
+   ```
 For example:
 
+   ```sh
     cargo run -- migrate -o backup.sql
+   ```
 ## Running from the Binary File:
 
 1. **Go to the target/release folder**:
     ```sh
     cd target/release
+   ```
 2. **Run the program**:
     ```sh
     ./spice <command> [options]
+    ```
 
 ## Running the Program Directly from Terminal
 
@@ -56,6 +61,7 @@ To make the `spice` program executable directly from the terminal without needin
 
    ```sh
    cargo build --release
+   ```
 
 This will create an executable file in the target/release directory.
 
@@ -63,27 +69,34 @@ This will create an executable file in the target/release directory.
 
 Move the compiled binary to a directory that's included in your system's PATH, such as /usr/local/bin:
 
+   ```sh
     sudo mv target/release/spice /usr/local/bin/
+   ```
 Now you can run the program from anywhere in the terminal.
 
 3. **Verify the installation**:
 
 Run the following command to ensure the program is accessible:
 
+   ```sh
     spice --help
+   ```
 This should display the help information for the spice program.
 
 After installing, you can use the program directly:
 
+   ```sh
     spice migrate -o backup.sql
-
+   ```
 ## Usage
 
 The program supports multiple commands. For example, the migrate command can be used to migrate the database or create a backup.
 
 ### Example migrate Command: 
 
+   ```sh
     cargo run -- migrate -t pull --db_type postgres --host localhost -u user -p password -d mydatabase -o backup.sql
+   ```
 #### Parameters Description:
 
 `-t`, `--operation_type`: Specifies the operation type (pull or migrate). Defaults to pull.<br><br>
@@ -102,13 +115,16 @@ Modify the source code as needed.
 
 ### Compile and run the program to test your changes:
 
+   ```sh
     cargo run -- <command> [options]
-
+   ```
   
 ### Use Git to commit changes:
 
+   ```sh
     git add .
     git commit -m "Your message"
+   ```
   
 ## License
 This project is licensed under the MIT License. See the LICENSE file for more details.
